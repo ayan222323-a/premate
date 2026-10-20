@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{{ attempt.subject }} test — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <form method="post" id="pm-take-form">
+    {% csrf_token %}
+
+    <div class="pm-take-bar">
+      <div class="pm-take-top">
+        <div class="pm-take-title">
+          {{ attempt.subject }}
+          <span class="pm-chip pm-chip-plain">{{ attempt.difficulty }}</span>
+        </div>
+        <div class="pm-take-stats">
+          <span><i class="bi bi-check2-square" aria-hidden="true"></i><span id="pm-answered" aria-live="polite">0 / {{ attempt.total }}</span></span>
+          <span><i class="bi bi-stopwatch" aria-hidden="true"></i><span id="pm-timer">00:00</span></span>
+        </div>
+      </div>
+      <div class="pm-meter" id="pm-take-meter" style="--pct:0"><span></span></div>
+    </div>
+
+    <p class="pm-muted" style="margin-bottom:1.25rem">{{ attempt.total }} questions. Sabhi answer karke Submit dabao.</p>
+
+    {% for q in questions %}
+    <section class="pm-card pm-q" aria-labelledby="ql-{{ q.id }}">
+      <span class="pm-q-no">Question {{ forloop.counter }}</span>
+      <p class="pm-q-text" id="ql-{{ q.id }}">{{ q.text }}</p>
+      <div class="pm-opts" role="radiogroup" aria-labelledby="ql-{{ q.id }}">
+        {% for opt in q.options %}
+        <label class="pm-opt" for="q{{ q.id }}_{{ forloop.counter0 }}">
+          <input type="radio" name="q_{{ q.id }}" id="q{{ q.id }}_{{ forloop.counter0 }}" value="{{ forloop.counter0 }}">
+          <span class="pm-bubble" aria-hidden="true"></span>
+          <span class="pm-opt-body"><span class="pm-opt-text">{{ opt }}</span></span>
+        </label>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+
+    <div class="pm-submit-row" style="justify-content:flex-end">
+      <button type="submit" class="pm-btn pm-btn-primary pm-btn-lg"><span id="pm-submit-label">Submit test</span></button>
+    </div>
+  </form>
+</div>
+{% endblock %}

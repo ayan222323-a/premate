@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Start mock interview — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <div class="pm-narrow">
+    <header class="pm-page-head">
+      <h1>Start a mock interview</h1>
+      <p>Upload your resume and choose the role you are targeting. The AI writes the questions from your profile.</p>
+    </header>
+
+    <div class="pm-card">
+      <form method="post" enctype="multipart/form-data" id="pm-upload-form" data-ai-loading="interview" novalidate>
+        {% csrf_token %}
+
+        <div class="pm-form-group">
+          <label class="pm-label" for="pm-file-input">Resume <small>(PDF only, max 5 MB)</small></label>
+          <div class="pm-drop-zone" id="pm-drop-zone" role="button" tabindex="0"
+            aria-label="Drag and drop your PDF here, or press Enter to browse">
+            <input type="file" name="file" id="pm-file-input" accept=".pdf" required tabindex="-1">
+            <span class="pm-drop-icon"><i class="bi bi-file-earmark-arrow-up" aria-hidden="true"></i></span>
+            <div class="pm-drop-title">Drag and drop your PDF here</div>
+            <div class="pm-drop-sub">or click to browse</div>
+          </div>
+          <div class="pm-file-selected" id="pm-file-label" aria-live="polite">
+            <i class="bi bi-file-earmark-check" aria-hidden="true"></i><span></span>
+          </div>
+          {% for error in form.file.errors %}
+          <div class="pm-field-error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="pm-form-group">
+          <label class="pm-label" for="id_job_role">Target job role</label>
+          <select name="job_role" id="id_job_role" class="pm-select" required>
+            {% for value, label in form.job_role.field.choices %}
+            <option value="{{ value }}" {% if form.job_role.value == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          {% for error in form.job_role.errors %}
+          <div class="pm-field-error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+          {% endfor %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="pm-field-error" style="margin-bottom:1rem">
+          <i class="bi bi-exclamation-triangle"></i>
+          <span>{% for error in form.non_field_errors %}{{ error }} {% endfor %}</span>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="pm-btn pm-btn-primary pm-btn-lg pm-btn-full" id="pm-upload-submit">
+          <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i> Upload and generate questions
+        </button>
+
+        <p class="pm-secure-note"><i class="bi bi-shield-lock" aria-hidden="true"></i> Your resume is processed securely and never shared.</p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

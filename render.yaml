@@ -1,0 +1,32 @@
+databases:
+  - name: prepmate-db
+    databaseName: prepmate
+    user: prepmate
+    plan: free
+
+services:
+  - type: web
+    name: prepmate
+    runtime: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn config.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.0
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: prepmate-db
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: DAILY_AI_LIMIT
+        value: "20"

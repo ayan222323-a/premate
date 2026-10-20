@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Sign in — PrepMate{% endblock %}
+
+{% block content %}
+<div class="container pm-auth-wrap">
+<div class="pm-auth">
+  <aside class="pm-auth-aside" aria-hidden="true">
+    <div class="pm-auth-top">
+      <h2>Your answers, graded.</h2>
+      <p class="pm-auth-lead">Practise interviews and timed tests, and see a score with feedback for every answer.</p>
+      <ul>
+        <li><i class="bi bi-check-lg"></i><span>Interview questions built from your resume</span></li>
+        <li><i class="bi bi-check-lg"></i><span>Timed aptitude and technical tests</span></li>
+        <li><i class="bi bi-check-lg"></i><span>Notes for the topics you keep missing</span></li>
+      </ul>
+    </div>
+
+    <div class="pm-auth-sample">
+      <p class="pm-auth-sample-q">Process vs thread?</p>
+      <p class="pm-auth-sample-a">Threads share memory inside a process.</p>
+      <div class="pm-mark" style="--mark-w:4.6rem">
+        <svg viewBox="0 0 120 80"><path pathLength="1" d="M62 7C94 5 117 21 114 41C111 62 84 76 55 74C26 72 6 58 9 38C12 18 36 8 66 10C82 11 94 16 101 23" /></svg>
+        <span class="pm-mark-text">7<small>/10</small></span>
+      </div>
+    </div>
+
+    <p class="pm-auth-foot">Free to use. No credit card needed.</p>
+  </aside>
+
+  <div class="pm-auth-main">
+    <div class="pm-auth-card">
+      <h1 class="pm-auth-title">Welcome back</h1>
+      <p class="pm-auth-subtitle">Sign in with your username and password to continue your prep.</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="pm-form-group">
+          <label class="pm-label" for="id_username">Username</label>
+          <div class="pm-input-wrap pm-has-icon">
+            <i class="bi bi-person pm-input-icon" aria-hidden="true"></i>
+            <input type="text" name="username" id="id_username" class="pm-input" placeholder="Enter your username"
+              autocomplete="username" autofocus required {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
+          </div>
+          {% for error in form.username.errors %}
+          <div class="pm-field-error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="pm-form-group">
+          <label class="pm-label" for="id_password">Password</label>
+          <div class="pm-input-wrap pm-has-icon">
+            <i class="bi bi-lock pm-input-icon" aria-hidden="true"></i>
+            <input type="password" name="password" id="id_password" class="pm-input" placeholder="Enter your password"
+              autocomplete="current-password" required>
+            <button type="button" class="pm-password-toggle" aria-label="Show password"><i class="bi bi-eye" aria-hidden="true"></i></button>
+          </div>
+          {% for error in form.password.errors %}
+          <div class="pm-field-error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+          {% endfor %}
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="pm-alert" role="alert">
+          <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+          <span>{% for error in form.non_field_errors %}{{ error }} {% endfor %}</span>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="pm-btn pm-btn-primary pm-btn-lg pm-btn-full">Sign in</button>
+      </form>
+
+      <div class="pm-divider-label">New to PrepMate?</div>
+      <div class="pm-auth-alt"><a href="{% url 'signup' %}" class="pm-btn pm-btn-outline">Create free account</a></div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

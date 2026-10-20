@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}PrepMate — Get graded before the real round does{% endblock %}
+
+{% block content %}
+<!-- ========= HERO ========= -->
+<section class="pm-hero">
+  <div class="container pm-hero-grid">
+    <div>
+      <h1>Get graded before the real round does.</h1>
+      <p class="pm-hero-sub">
+        Upload your resume and answer interview questions written for the role you want. Take timed aptitude and
+        technical tests. Every answer gets a score out of 10 and a note on how to fix it.
+      </p>
+      <div class="pm-hero-cta">
+        {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="pm-btn pm-btn-primary pm-btn-lg">Open dashboard</a>
+        {% else %}
+        <a href="{% url 'signup' %}" class="pm-btn pm-btn-primary pm-btn-lg">Start free</a>
+        <a href="{% url 'login' %}" class="pm-btn pm-btn-outline pm-btn-lg">Sign in</a>
+        {% endif %}
+      </div>
+      {% if not user.is_authenticated %}<p class="pm-hero-note">Free to use. No credit card needed.</p>{% endif %}
+    </div>
+
+    <!-- A graded answer: blue ballpoint is you, red pen is the AI grader -->
+    <figure class="pm-paper" aria-label="Example of a graded interview answer">
+      <div class="pm-paper-meta">
+        <span class="pm-chip">Software Developer</span>
+        <span>Question 3 of 8</span>
+      </div>
+      <p class="pm-paper-q">Explain the difference between a process and a thread.</p>
+      <p class="pm-paper-a">
+        A process has its own memory space. Threads live inside a process and
+        <span class="pm-ul">share its memory</span>, so they are cheaper to create and switch between.
+        <span class="pm-tick" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path pathLength="1" d="M3 13.5 8.5 19 21 4.5" /></svg>
+        </span>
+      </p>
+      <div class="pm-paper-foot">
+        <p class="pm-paper-note">Good. Add one line on context-switch cost.</p>
+        <div class="pm-mark" style="--mark-w:6.5rem" role="img" aria-label="Score: 7 out of 10">
+          <svg viewBox="0 0 120 80" aria-hidden="true">
+            <path pathLength="1" d="M62 7C94 5 117 21 114 41C111 62 84 76 55 74C26 72 6 58 9 38C12 18 36 8 66 10C82 11 94 16 101 23" />
+          </svg>
+          <span class="pm-mark-text" aria-hidden="true">7<small>/10</small></span>
+        </div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- ========= WHAT YOU CAN PRACTISE ========= -->
+<section class="pm-section">
+  <div class="container">
+    <h2 class="pm-section-title">Practise every part of the process</h2>
+    <p class="pm-section-sub">Interviews, tests, revision and a record of how you are improving, in one place.</p>
+
+    <div class="pm-tiles">
+      <article class="pm-tile pm-tile-wide">
+        <div>
+          <h3>Mock interview</h3>
+          <p>Upload your resume, pick a job role, and answer questions built from your own projects and skills. You get a score and written feedback on every answer.</p>
+        </div>
+        <div class="pm-tile-visual" aria-hidden="true">
+          <span class="pm-chip pm-chip-plain">Question 3 of 8</span>
+          <span class="pm-segs"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+      </article>
+
+      <article class="pm-tile">
+        <div>
+          <h3>Practice tests</h3>
+          <p>Timed aptitude and technical tests. Mark answers like an OMR sheet.</p>
+        </div>
+        <div class="pm-tile-visual" aria-hidden="true">
+          <span class="pm-bubbles">
+            <span class="pm-bubble">A</span><span class="pm-bubble">B</span><span class="pm-bubble is-filled">C</span><span class="pm-bubble">D</span>
+          </span>
+        </div>
+      </article>
+
+      <article class="pm-tile">
+        <div>
+          <h3>Progress</h3>
+          <p>Score trends, topic accuracy and your daily streak.</p>
+        </div>
+        <div class="pm-tile-visual" aria-hidden="true">
+          <span class="pm-bars"><i style="height:35%"></i><i style="height:48%"></i><i style="height:42%"></i><i style="height:66%"></i><i style="height:88%"></i></span>
+          <span class="pm-chip pm-chip-red"><i class="bi bi-fire"></i> 6 day streak</span>
+        </div>
+      </article>
+
+      <article class="pm-tile pm-tile-wide">
+        <div>
+          <h3>Study material for your weak topics</h3>
+          <p>Topics where you lose marks turn into short revision notes and a focused practice set.</p>
+        </div>
+        <div class="pm-tile-visual" aria-hidden="true">
+          <span class="pm-chip pm-chip-red">Normalization 42%</span>
+          <span class="pm-chip pm-chip-red">Deadlock 55%</span>
+          <span class="pm-chip pm-chip-amber">Python decorators 63%</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========= HOW IT WORKS ========= -->
+<section class="pm-section">
+  <div class="container">
+    <h2 class="pm-section-title">Start practising in under 2 minutes</h2>
+    <ol class="pm-steps">
+      <li class="pm-step">
+        <div class="pm-step-num" aria-hidden="true">1</div>
+        <h3 class="pm-step-title">Create a free account</h3>
+        <p class="pm-step-desc">Sign up with your email in seconds. No credit card needed.</p>
+      </li>
+      <li class="pm-step">
+        <div class="pm-step-num" aria-hidden="true">2</div>
+        <h3 class="pm-step-title">Upload your resume and pick a role</h3>
+        <p class="pm-step-desc">The AI reads your resume and writes interview questions for the job role you are targeting.</p>
+      </li>
+      <li class="pm-step">
+        <div class="pm-step-num" aria-hidden="true">3</div>
+        <h3 class="pm-step-title">Get scored and improve</h3>
+        <p class="pm-step-desc">Each answer gets a score out of 10 with feedback. Repeat until you are interview-ready.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ========= CTA ========= -->
+<section class="pm-section">
+  <div class="container">
+    <div class="pm-band">
+      <h2>Your first mock round is a few minutes away.</h2>
+      {% if user.is_authenticated %}
+      <a href="{% url 'upload_resume' %}" class="pm-btn pm-btn-mark pm-btn-lg">Start a mock interview</a>
+      {% else %}
+      <a href="{% url 'signup' %}" class="pm-btn pm-btn-mark pm-btn-lg">Create free account</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

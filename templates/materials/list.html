@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Study material — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <header class="pm-page-head">
+    <h1>Study material</h1>
+    <p>Notes on your weak topics, or on anything you want to revise.</p>
+  </header>
+
+  <div class="pm-stack">
+
+    <section class="pm-card">
+      <h2 class="pm-card-title"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Your weak topics</h2>
+      <ul class="pm-rows">
+        {% for t in weak %}
+        <li class="pm-row">
+          <div>
+            <div class="pm-row-title">{{ t.name }}</div>
+            <div class="pm-row-sub">{{ t.percent }}% accuracy ({{ t.total }} questions)</div>
+          </div>
+          <div class="pm-row-end">
+            <a class="pm-btn pm-btn-outline pm-btn-sm" href="{% url 'note_detail' %}?topic={{ t.name|urlencode }}">Read notes</a>
+            <form method="post" action="{% url 'practice_topic' %}" data-ai-loading="test">
+              {% csrf_token %}
+              <input type="hidden" name="topic" value="{{ t.name }}">
+              <button type="submit" class="pm-btn pm-btn-primary pm-btn-sm">Practice this topic</button>
+            </form>
+          </div>
+        </li>
+        {% empty %}
+        <li>
+          <div class="pm-empty">
+            {% if has_data %}Koi weak topic nahi mila, bahut badiya!
+            {% else %}Pehle ek <a href="{% url 'exam_select' %}">practice test</a> do, phir weak topics yahan dikhenge.{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="pm-card">
+      <h2 class="pm-card-title"><i class="bi bi-search" aria-hidden="true"></i> Notes on any topic</h2>
+      <form method="get" action="{% url 'note_detail' %}" class="pm-search" data-ai-loading="notes">
+        <label class="sr-only" for="pm-topic-input">Topic</label>
+        <input type="text" id="pm-topic-input" name="topic" class="pm-input"
+          placeholder="e.g. Normalization, Deadlock, Python decorators" maxlength="100" required>
+        <button type="submit" class="pm-btn pm-btn-primary" id="notesBtn">Get notes</button>
+      </form>
+    </section>
+
+    <section class="pm-card">
+      <h2 class="pm-card-title"><i class="bi bi-journal-bookmark" aria-hidden="true"></i> Saved notes</h2>
+      <ul class="pm-rows">
+        {% for n in notes %}
+        <li>
+          <a href="{% url 'note_detail' %}?topic={{ n.topic|urlencode }}" class="pm-row">
+            <span class="pm-row-title">{{ n.topic }}</span>
+            <span class="pm-row-sub">{{ n.created_at|date:"d M Y" }}</span>
+          </a>
+        </li>
+        {% empty %}
+        <li class="pm-empty-inline">Abhi koi saved notes nahi.</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Environment Variables & Secrets
+.env
+
+# Database
+*.sqlite3
+db.sqlite3
+
+# Ephemeral uploads & WhiteNoise collected static
+media/
+staticfiles/
+
+# Python bytecode & cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Operating system / IDE artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+
+*.zip

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Practice test — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <div class="pm-narrow">
+    <header class="pm-page-head">
+      <h1>Practice test</h1>
+      <p>Choose what you want to practise. The AI writes a fresh set of questions every time.</p>
+    </header>
+
+    <div class="pm-card">
+      <form method="post" id="testForm" data-ai-loading="test">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="pm-form-group pm-field">
+          <label class="pm-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="pm-helptext">{{ field.help_text }}</div>{% endif %}
+          {% for error in field.errors %}
+          <div class="pm-field-error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+        <div class="pm-field-error" style="margin-bottom:1rem">
+          <i class="bi bi-exclamation-triangle"></i>
+          <span>{% for error in form.non_field_errors %}{{ error }} {% endfor %}</span>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="pm-btn pm-btn-primary pm-btn-lg pm-btn-full" id="startBtn">
+          <i class="bi bi-play-fill" aria-hidden="true"></i> Start test
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

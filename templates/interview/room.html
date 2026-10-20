@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Interview room — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <div class="pm-room">
+
+    <section aria-label="Interview question">
+      <div class="pm-room-header">
+        <span class="pm-chip"><i class="bi bi-briefcase" aria-hidden="true"></i> {{ session.job_role }}</span>
+        <span class="pm-room-progress-label">Question {{ number }} of {{ total }}</span>
+      </div>
+
+      <div class="pm-progress" role="progressbar" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100" aria-label="Interview progress">
+        <div class="pm-progress-bar" id="pm-progress-bar" style="width: {{ percent }}%"></div>
+      </div>
+
+      <span class="pm-question-num">Question {{ number }}</span>
+      <p class="pm-question-text">{{ qa.question }}</p>
+
+      <form method="post" id="pm-room-form" novalidate>
+        {% csrf_token %}
+        <label class="pm-label" for="pm-answer-box">Your answer</label>
+        <textarea name="answer" id="pm-answer-box" class="pm-textarea pm-ruled" rows="7"
+          placeholder="Type your answer here. Be specific and use examples from your experience." required
+          aria-describedby="pm-char-counter"></textarea>
+        <div class="pm-char-counter" id="pm-char-counter" aria-live="polite">0 characters</div>
+
+        <div class="pm-room-footer">
+          <span class="pm-kbd-hint">Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to submit</span>
+          <button type="submit" class="pm-btn pm-btn-primary" id="pm-room-submit">
+            {% if number == total %}
+            <i class="bi bi-flag-fill" aria-hidden="true"></i> Finish interview
+            {% else %}
+            Next question
+            {% endif %}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="pm-card pm-star" aria-label="Answer tips">
+      <h2>Use the STAR method</h2>
+      <p>Aim for 100 to 200 characters or more for behavioural questions.</p>
+      <ul>
+        <li><span class="pm-star-letter" aria-hidden="true">S</span><div><b>Situation</b>Set the scene in one line.</div></li>
+        <li><span class="pm-star-letter" aria-hidden="true">T</span><div><b>Task</b>What were you responsible for?</div></li>
+        <li><span class="pm-star-letter" aria-hidden="true">A</span><div><b>Action</b>What exactly did you do?</div></li>
+        <li><span class="pm-star-letter" aria-hidden="true">R</span><div><b>Result</b>What changed? Add a number if you can.</div></li>
+      </ul>
+    </aside>
+
+  </div>
+</div>
+{% endblock %}

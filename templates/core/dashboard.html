@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <header class="pm-page-head">
+    <h1>Hi, {{ user.username }}</h1>
+    <p>Pick up where you left off.</p>
+  </header>
+
+  <div class="pm-board">
+    <a href="{% url 'upload_resume' %}" class="pm-board-tile pm-board-main" aria-label="Start a mock interview">
+      <span class="pm-board-icon"><i class="bi bi-camera-video-fill" aria-hidden="true"></i></span>
+      <div>
+        <h2>Mock interview</h2>
+        <p>Upload your resume, choose a job role, and answer questions written for you. Each answer gets a score and feedback.</p>
+      </div>
+      <span class="pm-board-cta">Start interview</span>
+    </a>
+
+    <a href="{% url 'exam_select' %}" class="pm-board-tile pm-board-wide" aria-label="Take a practice test">
+      <span class="pm-board-icon"><i class="bi bi-pencil-square" aria-hidden="true"></i></span>
+      <div>
+        <h2>Practice test</h2>
+        <p>Timed aptitude and technical questions, marked like an OMR sheet.</p>
+      </div>
+      <span class="pm-board-cta">Take a test</span>
+    </a>
+
+    <a href="{% url 'progress' %}" class="pm-board-tile" aria-label="View your progress">
+      <span class="pm-board-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></span>
+      <div>
+        <h2>Progress</h2>
+        <p>Scores, streak, weak topics.</p>
+      </div>
+      <span class="pm-board-cta">View stats</span>
+    </a>
+
+    <a href="{% url 'materials' %}" class="pm-board-tile" aria-label="Open study material">
+      <span class="pm-board-icon"><i class="bi bi-book-half" aria-hidden="true"></i></span>
+      <div>
+        <h2>Study material</h2>
+        <p>Notes on any topic.</p>
+      </div>
+      <span class="pm-board-cta">Open notes</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load l10n %}
+{% block title %}Progress — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <header class="pm-page-head">
+    <h1>Your progress</h1>
+    <p>How your tests and interviews are going, and what to work on next.</p>
+  </header>
+
+  <!-- Scoreboard -->
+  <div class="pm-scoreboard">
+    <div class="pm-score-cell"><span>Tests taken</span><b>{{ total_tests }}</b></div>
+    <div class="pm-score-cell"><span>Average score</span><b>{{ avg_percent|floatformat:"-1" }}%</b></div>
+    <div class="pm-score-cell"><span>Best score</span><b>{{ best_percent|floatformat:"-1" }}%</b></div>
+    <div class="pm-score-cell"><span><i class="bi bi-fire" aria-hidden="true"></i> Day streak</span><b>{{ streak }}</b></div>
+  </div>
+
+  {% if total_tests == 0 and total_interviews == 0 %}
+  <div class="pm-empty" style="margin-bottom:1rem">
+    Abhi koi data nahi hai. Ek <a href="{% url 'exam_select' %}">practice test</a> ya
+    <a href="{% url 'upload_resume' %}">mock interview</a> do, phir yahan progress dikhega.
+  </div>
+  {% endif %}
+
+  <div class="pm-stack">
+
+    <!-- Charts -->
+    <div class="pm-grid-2">
+      <section class="pm-card">
+        <h2 class="pm-card-title">Test scores over time</h2>
+        {% if line_values %}
+        <div class="pm-chart-box"><canvas id="lineChart" role="img" aria-label="Line chart of test scores over time"></canvas></div>
+        {% else %}
+        <p class="pm-empty-inline">Test dene ke baad chart dikhega.</p>
+        {% endif %}
+      </section>
+      <section class="pm-card">
+        <h2 class="pm-card-title">Topic-wise accuracy <small class="pm-muted" style="font-weight:500">weakest first</small></h2>
+        {% if bar_values %}
+        <div class="pm-chart-box" id="barBox"><canvas id="barChart" role="img" aria-label="Bar chart of accuracy by topic"></canvas></div>
+        {% else %}
+        <p class="pm-empty-inline">Test dene ke baad chart dikhega.</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <!-- Weak / strong -->
+    <div class="pm-grid-2">
+      <section class="pm-card">
+        <h2 class="pm-card-title"><span class="pm-chip pm-chip-red">Weak topics</span> <small class="pm-muted" style="font-weight:500">below 60%</small></h2>
+        {% for t in weak_topics %}
+        <div class="pm-topic">
+          <div class="pm-topic-top"><span>{{ t.name }}</span><span class="pm-value">{{ t.percent }}% <small>({{ t.correct }}/{{ t.total }})</small></span></div>
+          <div class="pm-meter bad" style="--pct:{{ t.percent|unlocalize }}"><span></span></div>
+        </div>
+        {% empty %}
+        <p class="pm-empty-inline">Koi weak topic nahi mila.</p>
+        {% endfor %}
+      </section>
+      <section class="pm-card">
+        <h2 class="pm-card-title"><span class="pm-chip pm-chip-green">Strong topics</span> <small class="pm-muted" style="font-weight:500">80% and above</small></h2>
+        {% for t in strong_topics %}
+        <div class="pm-topic">
+          <div class="pm-topic-top"><span>{{ t.name }}</span><span class="pm-value">{{ t.percent }}% <small>({{ t.correct }}/{{ t.total }})</small></span></div>
+          <div class="pm-meter good" style="--pct:{{ t.percent|unlocalize }}"><span></span></div>
+        </div>
+        {% empty %}
+        <p class="pm-empty-inline">Abhi koi strong topic nahi, practice karte raho.</p>
+        {% endfor %}
+      </section>
+    </div>
+
+    <!-- History -->
+    <div class="pm-grid-2">
+      <section class="pm-card">
+        <h2 class="pm-card-title">Recent tests</h2>
+        <ul class="pm-rows">
+          {% for a in recent_attempts %}
+          <li>
+            <a href="{% url 'test_result' a.id %}" class="pm-row">
+              <span class="pm-row-title">{{ a.subject }} <small class="pm-row-sub">({{ a.difficulty }})</small></span>
+              <span class="pm-value">{{ a.score }}/{{ a.total }}</span>
+            </a>
+          </li>
+          {% empty %}
+          <li class="pm-empty-inline">Koi test nahi.</li>
+          {% endfor %}
+        </ul>
+      </section>
+      <section class="pm-card">
+        <h2 class="pm-card-title">Recent interviews
+          {% if avg_interview %}<small class="pm-muted" style="font-weight:500">avg {{ avg_interview|floatformat:"-1" }}/10</small>{% endif %}
+        </h2>
+        <ul class="pm-rows">
+          {% for s in recent_sessions %}
+          <li>
+            <a href="{% url 'session_detail' s.id %}" class="pm-row">
+              <span class="pm-row-title">{{ s.job_role }}</span>
+              <span class="pm-value">{{ s.overall_score|floatformat:"-1" }}/10</span>
+            </a>
+          </li>
+          {% empty %}
+          <li class="pm-empty-inline">Koi interview nahi.</li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+  </div>
+</div>
+
+{{ line_labels|json_script:"line-labels" }}
+{{ line_values|json_script:"line-values" }}
+{{ bar_labels|json_script:"bar-labels" }}
+{{ bar_values|json_script:"bar-values" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  (function () {
+    function readJson(id) {
+      var el = document.getElementById(id);
+      return el ? JSON.parse(el.textContent) : [];
+    }
+    function cssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function draw() {
+      if (typeof Chart === 'undefined') return;
+      var ink2 = cssVar('--ink-2'), line = cssVar('--line'), blue = cssVar('--blue'),
+          blueSoft = cssVar('--blue-soft'), red = cssVar('--red'), green = cssVar('--green'),
+          sheet = cssVar('--sheet');
+
+      Chart.defaults.font.family = cssVar('--font');
+      Chart.defaults.color = ink2;
+      Chart.defaults.borderColor = line;
+
+      var lineEl = document.getElementById('lineChart');
+      if (lineEl) {
+        var old = Chart.getChart(lineEl); if (old) old.destroy();
+        new Chart(lineEl, {
+          type: 'line',
+          data: {
+            labels: readJson('line-labels'),
+            datasets: [{
+              label: 'Score %',
+              data: readJson('line-values'),
+              borderColor: blue, backgroundColor: blueSoft, fill: true, tension: 0.3,
+              borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: sheet, pointBorderColor: blue, pointBorderWidth: 2
+            }]
+          },
+          options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { min: 0, max: 100, ticks: { callback: function (v) { return v + '%'; } } }, x: { grid: { display: false } } }
+          }
+        });
+      }
+
+      var barEl = document.getElementById('barChart');
+      if (barEl) {
+        var oldBar = Chart.getChart(barEl); if (oldBar) oldBar.destroy();
+        var labels = readJson('bar-labels'), values = readJson('bar-values');
+        var box = document.getElementById('barBox');
+        if (box) box.style.height = Math.max(240, labels.length * 34 + 56) + 'px';
+        new Chart(barEl, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Accuracy %',
+              data: values,
+              backgroundColor: values.map(function (v) { return v < 60 ? red : (v >= 80 ? green : blue); }),
+              borderRadius: 4, barThickness: 16
+            }]
+          },
+          options: {
+            indexAxis: 'y', maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { min: 0, max: 100, ticks: { callback: function (v) { return v + '%'; } } }, y: { grid: { display: false } } }
+          }
+        });
+      }
+    }
+
+    draw();
+    window.addEventListener('pm-theme-changed', draw);
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Interview results — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <div class="pm-reading">
+
+    <header class="pm-results-head" {% if session.overall_score is not None and session.overall_score >= 7 %}data-celebrate{% endif %}>
+      {% if session.overall_score is not None %}
+      <div class="pm-mark" role="img" aria-label="Overall score {{ session.overall_score|floatformat:'-1' }} out of 10">
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <path pathLength="1" d="M62 7C94 5 117 21 114 41C111 62 84 76 55 74C26 72 6 58 9 38C12 18 36 8 66 10C82 11 94 16 101 23" />
+        </svg>
+        <span class="pm-mark-text" aria-hidden="true">{{ session.overall_score|floatformat:"-1" }}<small>/10</small></span>
+      </div>
+      {% endif %}
+      <div>
+        <p class="pm-results-title">Interview results</p>
+        <h1 class="pm-results-role">{{ session.job_role }}</h1>
+        {% if session.overall_score is not None %}
+        <p class="pm-remark">
+          {% if session.overall_score >= 7 %}Great performance. You're interview-ready.
+          {% elif session.overall_score >= 4 %}Good effort. Read the feedback below to level up.
+          {% else %}Keep practising. The feedback below shows what to fix first.{% endif %}
+        </p>
+        {% endif %}
+      </div>
+    </header>
+
+    {% for qa in qas %}
+    <article class="pm-qa-card {% if qa.score is not None %}{% if qa.score >= 7 %}score-high{% elif qa.score >= 4 %}score-mid{% else %}score-low{% endif %}{% endif %}">
+      <div class="pm-qa-header">
+        <div>
+          <span class="pm-qa-index">Question {{ forloop.counter }}</span>
+          <h2 class="pm-qa-question">{{ qa.question }}</h2>
+        </div>
+        {% if qa.score is not None %}
+        <span class="pm-score-badge {% if qa.score >= 7 %}high{% elif qa.score >= 4 %}mid{% else %}low{% endif %}">
+          {% if qa.score >= 7 %}<i class="bi bi-check-lg" aria-hidden="true"></i>{% elif qa.score >= 4 %}<i class="bi bi-dash-lg" aria-hidden="true"></i>{% else %}<i class="bi bi-x-lg" aria-hidden="true"></i>{% endif %}
+          {{ qa.score|floatformat:"-1" }}/10
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="pm-qa-answer">
+        <span class="pm-qa-label">Your answer</span>
+        <div class="pm-qa-text">{{ qa.answer|default:"(not answered)" }}</div>
+      </div>
+
+      {% if qa.feedback %}
+      <div class="pm-feedback-box">
+        <span class="pm-feedback-label"><i class="bi bi-pencil" aria-hidden="true"></i> Feedback</span>
+        {{ qa.feedback }}
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+
+    <div class="pm-actions">
+      <a href="{% url 'upload_resume' %}" class="pm-btn pm-btn-primary"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> New interview</a>
+      <a href="{% url 'dashboard' %}" class="pm-btn pm-btn-outline">Dashboard</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

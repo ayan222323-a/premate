@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Test result — PrepMate{% endblock %}
+
+{% block content %}
+<div class="pm-app-container">
+  <div class="pm-reading">
+
+    <header class="pm-test-summary pm-page-head" {% if percent >= 70 %}data-celebrate{% endif %}>
+      <div class="pm-mark" role="img" aria-label="Score {{ attempt.score }} out of {{ attempt.total }}">
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <path pathLength="1" d="M62 7C94 5 117 21 114 41C111 62 84 76 55 74C26 72 6 58 9 38C12 18 36 8 66 10C82 11 94 16 101 23" />
+        </svg>
+        <span class="pm-mark-text" aria-hidden="true">{{ attempt.score }}<small>/{{ attempt.total }}</small></span>
+      </div>
+      <div>
+        <p class="pm-results-title">Test result</p>
+        <h1 class="pm-results-role" style="font-size:clamp(1.7rem,3.6vw,2.5rem)">{{ attempt.subject }}</h1>
+        <p style="margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+          <span class="pm-chip pm-chip-plain">{{ attempt.difficulty }}</span>
+          <span class="pm-chip {% if percent >= 70 %}pm-chip-green{% elif percent >= 40 %}pm-chip-amber{% else %}pm-chip-red{% endif %}">{{ percent }}%</span>
+        </p>
+      </div>
+    </header>
+
+    <div class="pm-card" style="margin-bottom:1.25rem">
+      <h2 class="pm-card-title">Topic-wise breakdown</h2>
+      {% for t in topic_rows %}
+      <div class="pm-topic">
+        <div class="pm-topic-top"><span>{{ t.name }}</span><span class="pm-value">{{ t.correct }} / {{ t.total }}</span></div>
+        <div class="pm-meter {% widthratio t.correct t.total 100 as tp %}{% if tp|add:'0' >= 80 %}good{% elif tp|add:'0' < 60 %}bad{% endif %}" style="--pct:{{ tp }}"><span></span></div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% for r in rows %}
+    <article class="pm-review {% if r.is_correct %}ok{% else %}bad{% endif %}">
+      <span class="pm-qa-index">Question {{ forloop.counter }}</span>
+      <h2 class="pm-qa-question">{{ r.q.text }}</h2>
+
+      <div class="pm-review-line">
+        <span class="pm-qa-label">Your answer</span>
+        {% if r.selected %}
+        <span class="{% if r.is_correct %}pm-right{% else %}pm-wrong{% endif %}">{{ r.selected }}</span>
+        {% else %}
+        <span class="pm-muted">(not answered)</span>
+        {% endif %}
+      </div>
+      {% if not r.is_correct %}
+      <div class="pm-review-line">
+        <span class="pm-qa-label">Correct answer</span>
+        <span class="pm-right">{{ r.correct }}</span>
+      </div>
+      {% endif %}
+      {% if r.q.explanation %}
+      <div class="pm-explain"><b>Explanation:</b> {{ r.q.explanation }}</div>
+      {% endif %}
+    </article>
+    {% endfor %}
+
+    <div class="pm-actions">
+      <a href="{% url 'exam_select' %}" class="pm-btn pm-btn-primary">Take another test</a>
+      <a href="{% url 'dashboard' %}" class="pm-btn pm-btn-outline">Dashboard</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
